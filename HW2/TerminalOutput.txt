@@ -1,0 +1,138 @@
+Last login: Thu Sep 28 23:08:10 on ttys001
+Davids-MacBook-Pro-4:~ davidlevi$ ls
+Adlm				install_flash_player_osx.dmg
+Applications			installium_wrapper_v96.dmg
+Desktop				matlab_crash_dump.24291-1
+Documents			matlab_crash_dump.24291-2
+Downloads			nano.save
+Dropbox				nano.save.1
+Library				nano.save.2
+Libraryplugins			script.sh
+MegaBackup-1.7.1.pkg		smg.dmg
+Movies				src
+Music				test
+Pictures			test.c
+Public				test.save
+backups				valgrind-3.6.1
+foo				valgrind-3.6.1.tar.bz2
+hs_error_pid24291.log
+Davids-MacBook-Pro-4:~ davidlevi$ cd documents/homework
+Davids-MacBook-Pro-4:homework davidlevi$ ls
+Fall 15		Fall 16		Fall 17		MATLAB		Programming	Spring 16	Spring 17	Work
+Davids-MacBook-Pro-4:homework davidlevi$ cd programming
+Davids-MacBook-Pro-4:programming davidlevi$ ls
+DSA2proj1		DSA2proj3		DSA_2			deb			debugpractice.cpp	other			web
+DSA2proj2		DSA_1			Operating Systems	deb.dSYM		interview.cpp		prac
+Davids-MacBook-Pro-4:programming davidlevi$ cd operating\ systems
+Davids-MacBook-Pro-4:operating systems davidlevi$ ls
+HW1	HW2
+Davids-MacBook-Pro-4:operating systems davidlevi$ cd hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ ls
+A			TargetFile.txt		hw2.dSYM		hw2copy.c		symdupetargetfileb
+HW2.c			hw2			hw2copy			hw2copy.dSYM		symdupetargetfilec
+Davids-MacBook-Pro-4:hw2 davidlevi$ clear
+
+
+
+Davids-MacBook-Pro-4:hw2 davidlevi$ pwd
+/Users/davidlevi/documents/homework/programming/operating systems/hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ gcc hw2.c -o hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ ./hw2 targetfile.txt /Users/davidlevi/documents/homework/programming/operating\ systems/hw2
+DEBUG: Target is 24 bytes long, dev 16777220, ino 27359711
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/DupeTargetFileB.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/HardTargetFileB			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/SymTargetFileB		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/DupeTargetFileC.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/HardTargetFileC			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/SymTargetFileC		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfileb		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/B/DupeTargetFileB.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfilec		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/C/DupeTargetFileC.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/TargetFile.txt			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+Davids-MacBook-Pro-4:hw2 davidlevi$ clear
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Davids-MacBook-Pro-4:hw2 davidlevi$ gcc hw2.c -o hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ ./hw2 targetfile.txt /Users/davidlevi/documents/homework/programming/operating\ systems/hw2
+ERROR opening (null)
+Davids-MacBook-Pro-4:hw2 davidlevi$ ls
+A			TargetFile.txt		hw2.dSYM		hw2copy.c		symdupetargetfileb
+HW2.c			hw2			hw2copy			hw2copy.dSYM		symdupetargetfilec
+Davids-MacBook-Pro-4:hw2 davidlevi$ gcc hw2.c -o hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ ls
+A			TargetFile.txt		hw2.dSYM		hw2copy.c		symdupetargetfileb
+HW2.c			hw2			hw2copy			hw2copy.dSYM		symdupetargetfilec
+Davids-MacBook-Pro-4:hw2 davidlevi$ ./hw2 targetfile.txt /Users/davidlevi/documents/homework/programming/operating\ systems/hw2
+DEBUG: Target is 24 bytes long, dev 16777220, ino 27359711
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/DupeTargetFileB.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/HardTargetFileB			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/SymTargetFileB		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/DupeTargetFileC.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/HardTargetFileC			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/SymTargetFileC		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfileb		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/B/DupeTargetFileB.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfilec		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/C/DupeTargetFileC.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/TargetFile.txt			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+Davids-MacBook-Pro-4:hw2 davidlevi$ clear
+
+
+
+
+
+
+
+
+
+
+
+
+Davids-MacBook-Pro-4:hw2 davidlevi$ gcc hw2.c -o hw2
+Davids-MacBook-Pro-4:hw2 davidlevi$ ./hw2 targetfile.txt /Users/davidlevi/documents/homework/programming/operating\ systems/hw2
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/DupeTargetFileB.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/HardTargetFileB			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/B/SymTargetFileB		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/DupeTargetFileC.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/HardTargetFileC			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/A/C/SymTargetFileC		SYMLINK RESOLVES TO TARGET	
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfileb		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/B/DupeTargetFileB.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/symdupetargetfilec		SYMLINK (/Users/davidlevi/Documents/Homework/Programming/Operating Systems/HW2/A/C/DupeTargetFileC.txt) RESOLVES TO DUPLICATE
+/Users/davidlevi/documents/homework/programming/operating systems/hw2/TargetFile.txt			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+Davids-MacBook-Pro-4:hw2 davidlevi$ ./hw2 targetfile.txt ..
+../HW2/A/B/DupeTargetFileB.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+../HW2/A/B/HardTargetFileB			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+../HW2/A/B/SymTargetFileB		SYMLINK RESOLVES TO TARGET	
+../HW2/A/C/DupeTargetFileC.txt		DUPLICATE OF TARGET	nlink = 1	OK READ BY OTHER
+../HW2/A/C/HardTargetFileC			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+../HW2/A/C/SymTargetFileC		SYMLINK RESOLVES TO TARGET	
+../HW2/symdupetargetfileb		SYMLINK (a/b/dupetargetfileb.txt) RESOLVES TO DUPLICATE
+../HW2/symdupetargetfilec		SYMLINK (a/c/dupetargetfilec.txt) RESOLVES TO DUPLICATE
+../HW2/TargetFile.txt			HARD LINK TO TARGET	nlink = 4	OK READ BY OTHER
+Davids-MacBook-Pro-4:hw2 davidlevi$ ls
+A			TargetFile.txt		hw2			hw2copy			hw2copy.dSYM		symdupetargetfilec
+HW2.c			TerminalOutput.txt	hw2.dSYM		hw2copy.c		symdupetargetfileb
+Davids-MacBook-Pro-4:hw2 davidlevi$ cd a
+Davids-MacBook-Pro-4:a davidlevi$ ls
+B	C
+Davids-MacBook-Pro-4:a davidlevi$ cd b
+Davids-MacBook-Pro-4:b davidlevi$ ls
+DupeTargetFileB.txt	HardTargetFileB		SymTargetFileB
+Davids-MacBook-Pro-4:b davidlevi$ cd ../c
+Davids-MacBook-Pro-4:c davidlevi$ ls
+DupeTargetFileC.txt	HardTargetFileC		SymTargetFileC
+Davids-MacBook-Pro-4:c davidlevi$ 

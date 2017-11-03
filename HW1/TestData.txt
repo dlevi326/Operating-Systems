@@ -1,0 +1,29 @@
+Buffer size: 1 --> Time taken: 0.000171
+
+Buffer size: 2 --> Time taken: 0.000133
+
+Buffer size: 4 --> Time taken: 0.000163
+
+Buffer size: 8 --> Time taken: 0.000201
+
+Buffer size: 16 --> Time taken: 0.000169
+
+Buffer size: 32 --> Time taken: 0.000168
+
+Buffer size: 64 --> Time taken: 0.000200
+
+Buffer size: 128 --> Time taken: 0.000163
+
+Buffer size: 256 --> Time taken: 0.000171
+
+Buffer size: 512 --> Time taken: 0.000171
+
+Buffer size: 1024 --> Time taken: 0.000147
+
+Buffer size: 2048 --> Time taken: 0.000175
+
+Buffer size: 4096 --> Time taken: 0.000163
+
+Buffer size: 8192 --> Time taken: 0.000151
+
+Buffer size: 16384 --> Time taken: 0.000297
