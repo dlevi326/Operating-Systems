@@ -26,13 +26,9 @@ int main(int argc, char** argv){
 	int count=0;
 	char* dict = argv[1];
 
-	/*FILE* fp2;
-	fp2 = fopen(argv[1],"r");*/
-
 	
 	while(getline(&line,&n,fp)!=-1){
 		
-
 		FILE* fp2;
 		fp2 = fopen(dict,"r");
 		if(!fp2){
@@ -59,7 +55,6 @@ int main(int argc, char** argv){
 	}
 	free(line);
 	fclose(fp);
-	
 
 	fprintf(stderr,"MATCHED %d WORD(S)\n",count);
 
