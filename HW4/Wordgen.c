@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 
 char* generateword(int nc){
+
 	nc++;
 	char* str = malloc(sizeof(char) * nc);
 	const char charlist[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -26,13 +27,16 @@ char* generateword(int nc){
         str[i] = charlist[key];
     }
     str[nc] = '\0';
+
+    char* ans = str;
+    free(str);
     
-    return str;
+    return ans;
 }
 
 
 int main(int argc, char** argv){
-	int nc = 8; // Standard word size
+	int nc = 6; // Standard word size
 	int numwords = -1;
 
 	if(argc!=1){
