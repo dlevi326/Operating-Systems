@@ -25,34 +25,29 @@ int main(int argc, char** argv){
 	
 	while(getline(&line,&n,stdin)&&count<24){
 		count++;
+		line[strlen(line)-1]='\0';
+		printf("%s\n",line);
 		if(count==23){
-			printf("--Press RETURN for more--\n");
-			FILE* ttyfp = fopen("/dev/tty", "r");
-			char* line2 = NULL;
-			size_t n2=0;
-			while(getline(&line2,&n2,ttyfp)){
-				if(strcmp(line2,"q")==0||strcmp(line2,"Q")==0){
-					printf("YOU JUST PRESS Q:::::\n");
-					exit(1);
-				}
-				else if(strcmp(line2,"\n")==0){
-					count = -1;
-					break;
-				}
-			}
-  			
+			char* byte = malloc(sizeof(char)*1);
+    		write(1,"--Press RETURN for more--",25);
+    		int fd = open("/dev/tty", O_RDWR);
+    		ssize_t size = read(fd, byte, sizeof(byte));
+    		close(fd);
+    		byte[strlen(byte)-1] = '\0';
+
+    		if(size==-1){
+    			fprintf(stderr, "Error reading from terminal, exiting program\n");
+    			exit(-1);
+    		}
+    		else if(strcmp(byte,"q")==0||strcmp(byte,"Q")==0||size==0){ // Size=0 indicates cntrl-D
+    			fprintf(stderr,"EXITING\n");
+    			exit(0);
+    		}
+    		else{
+    			count = 0;
+    		}	
 		}
-		
-		printf("%s",line);
-
 	}
-	
-
-
-
-
-
-
 
 	return 0;
 }
