@@ -44,6 +44,7 @@ int main(int argc, char** argv){
 		while(getline(&line2,&n2,fp2)!=-1){
 			
 			if(strcmp(line,line2)==0){
+				printf("%s",line2);
 				count++;
 			}
 
