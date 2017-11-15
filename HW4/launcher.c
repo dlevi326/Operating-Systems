@@ -57,7 +57,37 @@ int main(int argc, char** argv){
 
 	int pid1,pid2,pid3;
 	printf("FIRST FORK\n");
-	switch(pid1 = fork()){
+
+	pid1 = fork();
+	if(pid1==0){
+		close(pipefd1[0]);
+		dup2(pipefd1[1],1);
+		execvp(comm1,argv);
+	}
+	else{
+		pchild1 = wait3(&status1,0,&ru1);
+
+		close(pipefd1[1]);
+		dup2(pipefd1[0],0);
+		if(fork()==0){
+			execvp(comm2,argv);
+		}
+		else{
+			pchild2 = wait3(&status2,0,&ru2);
+		}
+		
+	}
+	printf("Child %d return with %d\n",pchild1,status1);
+	printf("Child %d return with %d\n",pchild2,status2);
+	//printf("Child %d return with %d\n",pchild1,status1);
+
+
+
+
+
+
+
+	/*switch(pid1 = fork()){
 		case -1:
 			fprintf(stderr,"Error forking program\n");
 			break;
@@ -74,7 +104,7 @@ int main(int argc, char** argv){
 			//exit(1);
 			break;
 		default:
-			//pchild1 = wait3(&status1,0,&ru1);
+			pchild1 = wait3(&status1,0,&ru1);
 
 			switch(fork()){
 				case 0:
@@ -92,6 +122,7 @@ int main(int argc, char** argv){
 
 					//exit(1);
 				default:
+					//pchild2 = wait3(&status2,0,&ru2);
 					switch(fork()){
 						case 0:
 
@@ -115,7 +146,7 @@ int main(int argc, char** argv){
 			}
 
 			//close(pipefd1[0]);
-			/*close(pipefd1[1]);
+			close(pipefd1[1]);
 			close(pipefd2[0]);
 			close(pipefd2[1]);
 
@@ -126,10 +157,10 @@ int main(int argc, char** argv){
 			//pchild1 = wait3(&status1,0,&ru1);
 			//pchild2 = wait3(&status2,0,&ru2);
 			//pchild3 = wait3(&status3,0,&ru3);
-
-			
-	}
-	//pchild1 = wait3(&status1,0,&ru1);
+			//pchild2 = wait3(&status2,0,&ru2);
+			//printf("Child %d exited with %d\n",pchild1,status1);	
+	//}
+	//printf("Child exited with ")
 	//pchild2 = wait3(&status2,0,&ru2);
 	//pchild3 = wait3(&status3,0,&ru3);
 
