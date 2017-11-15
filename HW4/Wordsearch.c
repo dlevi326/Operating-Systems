@@ -18,21 +18,22 @@
 
 
 int main(int argc, char** argv){
-
+	printf("Wordsearch starting.....\n");
 	char* line;
 	size_t n = 0;
-	FILE* fp;
-	fp = stdin;
+	//FILE* fp;
+	//fp = stdin;
 	int count=0;
-	char* dict = argv[1];
+	char* dict = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/dictionaryupper.txt";
 
-	
-	while(getline(&line,&n,fp)!=-1){
+	//printf("*");
+	while(getline(&line,&n,stdin)!=-1){
+		//printf("*\n");
 		
 		FILE* fp2;
 		fp2 = fopen(dict,"r");
 		if(!fp2){
-			fprintf(stderr,"ERROR\n");
+			printf("ERROR opening dictionary\n");
 			break;
 		}
 		
@@ -55,14 +56,10 @@ int main(int argc, char** argv){
 
 	}
 	free(line);
-	fclose(fp);
+	//fclose(fp);
 
-	fprintf(stderr,"MATCHED %d WORD(S)\n",count);
-
-
-
-
-
+	printf("MATCHED %d WORD(S)\n",count);
+	
 
 	return 0;
 }
