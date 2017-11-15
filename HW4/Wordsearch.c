@@ -58,7 +58,7 @@ int main(int argc, char** argv){
 	free(line);
 	//fclose(fp);
 
-	printf("MATCHED %d WORD(S)\n",count);
+	fprintf(stderr,"MATCHED %d WORD(S)\n",count);
 	
 
 	return 0;

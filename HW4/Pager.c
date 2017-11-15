@@ -22,8 +22,13 @@ int main(int argc, char** argv){
 	char* line = NULL;
 	size_t n=0;
 	int count = 0;
+    int numread;
 	
-	while(getline(&line,&n,stdin)&&count<24){
+	while((numread = getline(&line,&n,stdin))&&count<24){
+        if(numread==-1){
+            fprintf(stderr,"END OF FILE EXITING PAGER\n");
+            exit(0);
+        }
 		count++;
 		line[strlen(line)-1]='\0';
 		printf("%s\n",line);

@@ -53,7 +53,7 @@ int main(int argc, char** argv){
 	int pchild3;
 
 	pipe(pipefd1);
-	pipe(pipefd2);
+	//pipe(pipefd2);
 
 	int pid1,pid2,pid3;
 	printf("FIRST FORK\n");
@@ -66,20 +66,37 @@ int main(int argc, char** argv){
 	}
 	else{
 		pchild1 = wait3(&status1,0,&ru1);
-
+		//printf("Child %d return with %d\n",pchild1,WEXITSTATUS(status1));
+		
 		close(pipefd1[1]);
 		dup2(pipefd1[0],0);
+		pipe(pipefd2);
+		//close(pipefd2[0]);
+		//dup2(pipefd2[1],1);
 		if(fork()==0){
+
+			close(pipefd2[0]);
+			dup2(pipefd2[1],1);
 			execvp(comm2,argv);
 		}
 		else{
 			pchild2 = wait3(&status2,0,&ru2);
+			//printf("Child %d return with %d\n",pchild2,WEXITSTATUS(status2));
+			close(pipefd2[1]);
+			dup2(pipefd2[0],0);
+			if(fork()==0){
+				execvp(comm3,argv);
+			}
+			else{
+				pchild3 = wait3(&status3,0,&ru3);
+				//printf("Child %d return with %d\n",pchild3,WEXITSTATUS(status3));
+			}
 		}
 		
 	}
-	printf("Child %d return with %d\n",pchild1,status1);
-	printf("Child %d return with %d\n",pchild2,status2);
-	//printf("Child %d return with %d\n",pchild1,status1);
+	printf("Child %d return with %d\n",pchild1,WEXITSTATUS(status1));
+	printf("Child %d return with %d\n",pchild2,WEXITSTATUS(status2));
+	printf("Child %d return with %d\n",pchild3,WEXITSTATUS(status3));
 
 
 
