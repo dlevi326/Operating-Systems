@@ -1,7 +1,3 @@
-// David Levi
-// Operating Systems
-// HW 4 -- Launcher
-
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -15,155 +11,127 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 
-/*close(pipefd1[0]);
-close(pipefd1[1]);
-close(pipefd2[0]);
-close(pipefd2[1]);*/
 
+/**
+ * Executes the command "cat scores | grep Villanova | cut -b 1-10".
+ * This quick-and-dirty version does no error checking.
+ *
+ * @author Jim Glenn
+ * @version 0.1 10/4/2004
+ */
 
+int main(int argc, char **argv)
+{
+  int status;
+  int i;
+  struct rusage ru;
 
+  // arguments for commands; your parser would be responsible for
+  // setting up arrays like these
 
-int main(int argc, char** argv){
+  char *cat_args = "./wordgen.exe";
+  char *grep_args = "./wordsearch.exe";
+  char *cut_args = "./pager.exe";
 
-	char* comm1 = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/Wordgen.exe";
-	char* comm2 = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/Wordsearch.exe";
-	char* comm3 = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/Pager.exe";
+  // make 2 pipes (cat to grep and grep to cut); each has 2 fds
 
-	//execvp(comm1,argv);
-	char** args = argv;
-	
-	
-	
-	int pipefd1[2];
-	int pipefd2[2];
+  int pipes[4];
+  pipe(pipes); // sets up 1st pipe
+  pipe(pipes + 2); // sets up 2nd pipe
 
-	int status1;
-	struct rusage ru1;
-	int pchild1;
+  // we now have 4 fds:
+  // pipes[0] = read end of cat->grep pipe (read by grep)
+  // pipes[1] = write end of cat->grep pipe (written by cat)
+  // pipes[2] = read end of grep->cut pipe (read by cut)
+  // pipes[3] = write end of grep->cut pipe (written by grep)
 
-	int status2;
-	struct rusage ru2;
-	int pchild2;
+  // Note that the code in each if is basically identical, so you
+  // could set up a loop to handle it.  The differences are in the
+  // indicies into pipes used for the dup2 system call
+  // and that the 1st and last only deal with the end of one pipe.
 
-	int status3;
-	struct rusage ru3;
-	int pchild3;
+  // fork the first child (to execute cat)
+  
+  if (fork() == 0)
+    {
+      // replace cat's stdout with write part of 1st pipe
 
-	pipe(pipefd1);
-	pipe(pipefd2);
+      dup2(pipes[1], 1);
 
-	int pid1,pid2,pid3;
+      // close all pipes (very important!); end we're using was safely copied
 
-	switch(pid1 = fork()){
-		case -1:
-			fprintf(stderr,"Error forking program\n");
-			break;
-		case 0:
-			close(pipefd1[0]);
-			//close(pipefd1[1]);
-			close(pipefd2[0]);
-			close(pipefd2[1]);
+      close(pipes[0]);
+      close(pipes[1]);
+      close(pipes[2]);
+      close(pipes[3]);
 
-			dup2(pipefd1[1],1);
-			execvp(comm1,argv);
-			close(pipefd1[1]);
-			
-			exit(1);
-			break;
-		default:
-			pchild1 = wait3(&status1,0,&ru1);
+      execvp(cat_args, argv);
+    }
+  else
+    {
+      // fork second child (to execute grep)
 
-			switch(pid2=fork()){
-				case 0:
-					//close(pipefd1[0]);
-					close(pipefd1[1]);
-					close(pipefd2[0]);
-					close(pipefd2[1]);
+      if (fork() == 0)
+	{
+	  // replace grep's stdin with read end of 1st pipe
+	  
+	  dup2(pipes[0], 0);
 
-					dup2(pipefd1[0],0);
-					execvp(comm3,argv);
-					close(pipefd1[0]);
-			
-					//exit(1);
-					break;
-				default:
-					pchild2 = wait3(&status2,0,&ru2);
-					printf("DONE!");
-			}
+	  // replace grep's stdout with write end of 2nd pipe
+
+	  dup2(pipes[3], 1);
+
+	  // close all ends of pipes
+
+	  close(pipes[0]);
+	  close(pipes[1]);
+	  close(pipes[2]);
+	  close(pipes[3]);
+
+	  execvp(grep_args, argv);
 	}
+      else
+	{
+	  // fork third child (to execute cut)
 
+	  if (fork() == 0)
+	    {
+	      // replace cut's stdin with input read of 2nd pipe
 
-	/*switch(fork()){
-		case 0:
-			//close(pipefd1[0]);
-			close(pipefd1[1]);
-			close(pipefd2[0]);
-			//close(pipefd2[1]);
-			dup2(pipefd1[0],0);
-			dup2(pipefd2[1],1);
-			execvp(comm2,argv);
-			close(pipefd1[0]);
-			close(pipefd2[1]);
-			exit(1);
-			break;
+	      dup2(pipes[2], 0);
+
+	      // close all ends of pipes
+
+	      close(pipes[0]);
+	      close(pipes[1]);
+	      close(pipes[2]);
+	      close(pipes[3]);
+
+	      execvp(cut_args, argv);
+	    }
 	}
+    }
+      
+  // only the parent gets here and waits for 3 children to finish
+  
+  close(pipes[0]);
+  close(pipes[1]);
+  close(pipes[2]);
+  close(pipes[3]);
 
-	switch(fork()){
-		case 0:
-			close(pipefd1[0]);
-			close(pipefd1[1]);
-			//close(pipefd2[0]);
-			close(pipefd2[1]);
-			dup2(pipefd2[0],0);
-			execvp(comm3,argv);
-			close(pipefd2[0]);
-			exit(1);
-			break;
-	}*/
-
-
-
-		/*default:
-			pchild1 = wait3(&status1,0,&ru1);
-
-			switch(fork()){
-				case 0:
-					//close(pipefd1[0]);
-					close(pipefd1[1]);
-					close(pipefd2[0]);
-					close(pipefd2[1]);
-					dup2(pipefd1[0],0);
-					execvp(comm2,argv);
-					close(pipefd1[0]);
-					exit(1);
-					break;
-				default:
-					//pchild2 = wait3(&status2,0,&ru2);
-					printf("********\n");
-					if(wait(&status2)==-1){
-						fprintf(stderr,"Error waiting\n");
-					}
-					printf("This is the parent\n");
-
-			}*/
-
-			//close(pipefd1[0]);
-			/*close(pipefd1[1]);
-			close(pipefd2[0]);
-			close(pipefd2[1]);
-			dup2(pipefd1[0],0);
-			execvp(comm2,argv);
-			close(pipefd1[0]);
-			exit(1);*/
-
-			
-
-	
-
-	
-
-
-
-
-	return 0;
+  /*for (i = 0; i < 3; i++){
+  	wait3(&status,0,&ru);
+  }*/
+  int pchild1,pchild2,pchild3;
+  int status1,status2,status3;
+  struct rusage ru1;
+  struct rusage ru2;
+  struct rusage ru3;
+  	pchild1 = wait3(&status1,0,&ru1);
+	printf("Child %d return with %d\n",pchild1,WEXITSTATUS(status1));
+	pchild2 = wait3(&status2,0,&ru2);
+	printf("Child %d return with %d\n",pchild2,WEXITSTATUS(status2));
+	pchild3 = wait3(&status3,0,&ru3);
+	printf("Child %d return with %d\n",pchild3,WEXITSTATUS(status3));
+    
 }

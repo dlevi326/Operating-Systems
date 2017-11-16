@@ -23,29 +23,31 @@ int main(int argc, char** argv){
 	size_t n=0;
 	int count = 0;
     int numread;
+    FILE* fp;
+    int c;
 	
 	while((numread = getline(&line,&n,stdin))&&count<24){
         if(numread==-1){
-            fprintf(stderr,"END OF FILE EXITING PAGER\n");
+            fprintf(stderr,"End of file, exiting pager\n");
             exit(0);
         }
 		count++;
 		line[strlen(line)-1]='\0';
 		printf("%s\n",line);
 		if(count==23){
-			char* byte = malloc(sizeof(char)*1);
-    		write(1,"--Press RETURN for more--",25);
-    		int fd = open("/dev/tty", O_RDWR);
-    		ssize_t size = read(fd, byte, sizeof(byte));
-    		close(fd);
-    		byte[strlen(byte)-1] = '\0';
+            printf("--Press RETURN for more--");
+    		if((fp = fopen("/dev/tty", "w+"))<0){
+                fprintf(stderr,"Error opening /dev/tty: %s\n",strerror(errno));
+            }
+            c = getc(fp);
+            fclose(fp);
 
-    		if(size==-1){
+    		if(c<0){
     			fprintf(stderr, "Error reading from terminal, exiting program\n");
     			exit(-1);
     		}
-    		else if(strcmp(byte,"q")==0||strcmp(byte,"Q")==0||size==0){ // Size=0 indicates cntrl-D
-    			fprintf(stderr,"EXITING\n");
+    		else if(c==81||c==113||c==0){ 
+    			fprintf(stderr,"Exiting pager\n");
     			exit(0);
     		}
     		else{
@@ -53,6 +55,9 @@ int main(int argc, char** argv){
     		}	
 		}
 	}
+    free(line);
+
+    
 
 
 	return 0;

@@ -15,7 +15,7 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 
-char* generateword(int nc){
+char* generateword(int nc){ // Generates random words based on size nc
 
 	nc++;
 	char* str = malloc(sizeof(char) * nc);
@@ -48,15 +48,11 @@ int main(int argc, char** argv){
 	srand(time(0));
 	int sizeword = nc;
 	while(numwords!=0){
-
 		sizeword = (rand()%nc)+3;
 		printf("%s\n",generateword(sizeword));
 		numwords--;
 	}
 	
-
-
-
 
 
 

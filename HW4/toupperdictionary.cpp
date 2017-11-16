@@ -38,7 +38,9 @@ int main(){
     string word;
     while (file >> word){
       transform(word.begin(), word.end(), word.begin(), ::toupper);
-      output<<word<<endl;
+      if(word.length()<4){
+        output<<word<<endl;
+      }
 
     }
 

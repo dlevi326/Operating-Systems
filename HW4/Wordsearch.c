@@ -15,26 +15,28 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
+#include <signal.h>
+
+int count=0;
+
+void handler(){
+	fprintf(stderr,"MATCHED %d WORD(S)\n",count);
+	exit(0);
+}
 
 
 int main(int argc, char** argv){
-	printf("Wordsearch starting.....\n");
 	char* line;
 	size_t n = 0;
-	//FILE* fp;
-	//fp = stdin;
-	int count=0;
-	char* dict = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/dictionaryupper.txt";
-
-	//printf("*");
-	while(getline(&line,&n,stdin)!=-1){
-		//printf("*\n");
+	// Had to make dictionary shorter because it was way too long
+	char* dict = "/Users/davidlevi/documents/homework/programming/operating_systems/hw4/shorterdict.txt"; 
+	signal(SIGPIPE,handler);
+	
+	while(getline(&line,&n,stdin)!=-1){// Reading from stdin
 		
 		FILE* fp2;
-		fp2 = fopen(dict,"r");
-		if(!fp2){
-			printf("ERROR opening dictionary\n");
-			break;
+		if((fp2 = fopen(dict,"r"))<0){
+			fprintf(stderr,"Error opening %s: %s\n",dict,strerror(errno));
 		}
 		
 		char* line2 = NULL;
@@ -42,7 +44,7 @@ int main(int argc, char** argv){
 		int check1 = 0;
 
 
-		while(getline(&line2,&n2,fp2)!=-1){
+		while(getline(&line2,&n2,fp2)!=-1){ // Reading from dictionary
 			
 			if(strcmp(line,line2)==0){
 				printf("%s",line2);
@@ -56,7 +58,7 @@ int main(int argc, char** argv){
 
 	}
 	free(line);
-	//fclose(fp);
+	
 
 	fprintf(stderr,"MATCHED %d WORD(S)\n",count);
 	
