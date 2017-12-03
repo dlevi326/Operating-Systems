@@ -30,15 +30,20 @@ void questionOne(){
         int flags = MAP_SHARED;
 
         char* buf = "This is initial text 1";
-        int fd = open("text1.txt", O_RDWR|O_TRUNC|O_CREAT, 0666);
-        write(fd,buf,strlen(buf));
+        int fd = open("text1.txt", O_RDWR|O_TRUNC|O_CREAT, 0666); // Creating first text file
+        if(fd==-1){
+                fprintf(stderr,"Error opening file\n");
+                exit(-1);
+        }
+        if(write(fd,buf,strlen(buf))==-1){
+                fprintf(stderr,"Error writing to text file\n");
+                exit(-1);
+        }
 
         struct stat sb;
-        if(fd==-1){
-                fprintf(stderr,"Error opening initialtext.txt\n");
-        }
         if (fstat(fd, &sb) == -1){
                 fprintf(stderr,"Error stating file\n");
+                exit(-1);
         }
         int length = sb.st_size;
 
@@ -48,13 +53,14 @@ void questionOne(){
         char* pm = mmap(addr, length-pa_offset, prot, flags, fd, pa_offset);
 
         if (pm == MAP_FAILED){
-                fprintf(stderr,"Error mapping mem\n");
+                fprintf(stderr,"Error mapping memory\n");
+                exit(-1);
         }
 
         signal(SIGSEGV,handleSeg);
         signal(SIGBUS,handleBus);
         
-        char* word = "Other appended message";
+        char* word = "Other message";
         /*for(int i=0;i<strlen(word);i++){
                 signal(SIGBUS,handleBus);
                 signal(SIGSEGV,handleSeg);
@@ -62,15 +68,34 @@ void questionOne(){
         }*/
         if(memcpy(pm,word,strlen(word))==NULL){
                 fprintf(stderr,"Error copying memory\n");
+                exit(-1);
         }
 
-
-        
         if(msync(pm,length, MS_SYNC)==-1){
                 fprintf(stderr,"Error syncing to file\n");
+                exit(-1);
         }
 
-        printf("Wrote to memory succesfully\n");
+        if(lseek(fd,0,SEEK_SET)==-1){
+                fprintf(stderr,"Error seeking file\n");
+                exit(-1);
+        }
+
+        char* buf2 = malloc(sizeof(char)*1);
+
+        if(read(fd,buf2,1)==-1){
+                fprintf(stderr,"Error reading from file\n");
+                exit(-1);
+        }
+
+        if(strcmp(buf2,&buf[0])==0){
+                exit(255);
+        }
+        else{
+                exit(0);
+        }
+
+        fprintf(stderr,"Wrote to memory succesfully\n");
 
 }
 
@@ -89,16 +114,20 @@ void questionTwoAndThree(int question){
         char* buf = "This is initial text 2";
         int fd = open("text2.txt", O_RDWR|O_CREAT|O_TRUNC, 0666);
 
+        if(fd==-1){
+                fprintf(stderr,"Error opening file\n");
+                exit(-1);
+        }
+
         if(write(fd,buf,strlen(buf))<0){
-                fprintf(stderr,"Error writing\n");
+                fprintf(stderr,"Error writing to file\n");
+                exit(-1);
         }
 
         struct stat sb;
-        if(fd==-1){
-                fprintf(stderr,"Error opening initialtext.txt\n");
-        }
         if (fstat(fd, &sb) == -1){
                 fprintf(stderr,"Error stating file\n");
+                exit(-1);
         }
         int length = sb.st_size;
 
@@ -109,7 +138,7 @@ void questionTwoAndThree(int question){
 
         if (pm == MAP_FAILED){
                 fprintf(stderr,"Error mapping mem\n");
-                exit(1);
+                exit(-1);
         }
 
         char letter = 'X';
@@ -120,14 +149,17 @@ void questionTwoAndThree(int question){
                 
         if(msync(pm,length, MS_SYNC)==-1){
                 fprintf(stderr,"Error syncing to file\n");
+                exit(-1);
         }
 
         char* buf2 = malloc(sizeof(char)*1);
         if(lseek(fd,0,SEEK_SET)==-1){
                 fprintf(stderr,"Error lseeking\n");
+                exit(-1);
         }
         if(read(fd,buf2,1)==-1){
                 fprintf(stderr,"Error reading from file\n");
+                exit(-1);
         }
         printf("Read: %s\n",buf2);
         if(*buf2==letter){
@@ -151,23 +183,33 @@ void questionFour(){
         char* buf = "This is initial text 3";
         int fd = open("text3.txt", O_RDWR|O_CREAT|O_TRUNC, 0666);
 
+        if(fd==-1){
+                fprintf(stderr,"Error opening file\n");
+        }
+
         int count=0;
-        while(write(fd,"Y",1)&&count<5000){
+        int bytenum;
+        while((bytenum = write(fd,"Y",1))&&count<5000){
+                if(bytenum==-1){
+                        fprintf(stderr,"Error writing to file\n");
+                        exit(-1);
+                }
                 count++;
         }
 
         if(lseek(fd,0,SEEK_SET)==-1){
-                fprintf(stderr,"Error lseeking\n");
+                fprintf(stderr,"Error lseeking file\n");
+                exit(-1);
         }
 
 
         struct stat sb;
-        if(fd==-1){
-                fprintf(stderr,"Error opening initialtext.txt\n");
-        }
+
         if (fstat(fd, &sb) == -1){
                 fprintf(stderr,"Error stating file\n");
+                exit(-1);
         }
+
         int length = sb.st_size; // Length is 5523 --> "...from other 8-bit encodings.[3]"
 
         off_t offset = 0;
@@ -177,6 +219,7 @@ void questionFour(){
 
         if (pm == MAP_FAILED){
                 fprintf(stderr,"Error mapping mem\n");
+                exit(-1);
         }
 
         char letter = 'X';
@@ -186,19 +229,23 @@ void questionFour(){
                 
         
         if(msync(pm,length+5, MS_SYNC)==-1){
-                fprintf(stderr,"Error syncing to file\n");
+                fprintf(stderr,"Error syncing back to file\n");
+                exit(-1);
         }
 
         struct stat sb2;
         if(fstat(fd,&sb2)==-1){
                 fprintf(stderr,"Error stating modified file\n");
+                exit(-1);
         }
         int lengthmod = sb2.st_size;
         if(lengthmod==length){
                 printf("File size stayed the same, exiting with 1\n");
+                exit(1);
         }
         else{
                 printf("File size changed, exiting with 0\n");
+                exit(0);
         }
 
 }
@@ -211,21 +258,28 @@ void questionFive(){
 
         char* buf = "This is initial text 4";
         int fd = open("text4.txt", O_RDWR|O_CREAT|O_TRUNC, 0666);
+        if(fd==-1){
+                fprintf(stderr,"Error opening file\n");
+                exit(-1);
+        }
 
         int count=0;
-        while(write(fd,"Y",1)&&count<5000){
+        int bytenum;
+        while((bytenum = write(fd,"Y",1))&&count<5000){
+                if(bytenum==-1){
+                        fprintf(stderr,"Error writing to file\n");
+                        break;
+                }
                 count++;
         }
 
         if(lseek(fd,0,SEEK_SET)==-1){
-                fprintf(stderr,"Error lseeking\n");
+                fprintf(stderr,"Error lseeking file\n");
+                exit(-1);
         }
 
 
         struct stat sb;
-        if(fd==-1){
-                fprintf(stderr,"Error opening initialtext.txt\n");
-        }
         if (fstat(fd, &sb) == -1){
                 fprintf(stderr,"Error stating file\n");
         }
@@ -237,7 +291,8 @@ void questionFive(){
         char* pm = mmap(addr, length-pa_offset, prot, flags, fd, pa_offset);
 
         if (pm == MAP_FAILED){
-                fprintf(stderr,"Error mapping mem\n");
+                fprintf(stderr,"Error mapping memory\n");
+                exit(-1);
         }
 
         char letter = 'X';
@@ -246,19 +301,24 @@ void questionFive(){
         signal(SIGSEGV,handleSeg);
         if(msync(pm,length+5, MS_SYNC)==-1){
                 fprintf(stderr,"Error syncing to file\n");
+                exit(-1);
         }
         if(lseek(fd,length+16,SEEK_SET)==-1){
-                fprintf(stderr,"Error lseeking\n");
+                fprintf(stderr,"Error lseeking file\n");
+                exit(-1);
         }
         if(write(fd,"Y",1)==-1){
                 fprintf(stderr,"Error writing\n");
+                exit(-1);
         }
         if(lseek(fd,length+5,SEEK_SET)==-1){
-                fprintf(stderr,"Error lseeking\n");
+                fprintf(stderr,"Error lseeking file\n");
+                exit(-1);
         }
         char* buf2 = malloc(sizeof(char)*1);
         if(read(fd,buf2,1)==-1){
-                fprintf(stderr,"Error reading\n");
+                fprintf(stderr,"Error reading from file\n");
+                exit(-1);
         }
         if(strcmp(buf2,"X")==0){
                 printf("Can see X, exiting 0\n");
@@ -283,23 +343,30 @@ void questionSix(){
 
         char* buf = "This is initial text 5";
         int fd = open("text5.txt", O_RDWR|O_CREAT|O_TRUNC, 0666);
+        if(fd==-1){
+                fprintf(stderr,"Error opening file\n");
+        }
 
         int count=0;
-        while(write(fd,"Y",1)&&count<3000){
+        int bytenum;
+        while((bytenum = write(fd,"Y",1))&&count<3000){
+                if(bytenum == -1){
+                        fprintf(stderr, "Error writing to file\n");
+                }
                 count++;
         }
 
         if(lseek(fd,0,SEEK_SET)==-1){
-                fprintf(stderr,"Error lseeking\n");
+                fprintf(stderr,"Error lseeking file\n");
+                exit(-1);
         }
 
 
         struct stat sb;
-        if(fd==-1){
-                fprintf(stderr,"Error opening initialtext.txt\n");
-        }
+        
         if (fstat(fd, &sb) == -1){
                 fprintf(stderr,"Error stating file\n");
+                exit(-1);
         }
         int length = sb.st_size; // Length is 5523 --> "...from other 8-bit encodings.[3]"
 
@@ -309,7 +376,8 @@ void questionSix(){
         char* pm = mmap(addr, (8192)-pa_offset, prot, flags, fd, pa_offset);
 
         if (pm == MAP_FAILED){
-                fprintf(stderr,"Error mapping mem\n");
+                fprintf(stderr,"Error mapping memory\n");
+                exit(-1);
         }
 
         signal(SIGBUS,handleBus);
