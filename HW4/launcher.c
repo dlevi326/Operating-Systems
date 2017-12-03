@@ -16,14 +16,11 @@
 #include <sys/wait.h>
 #include <setjmp.h>
 
-
-
 int main(int argc, char** argv){
 	
 	char* comm1 = "./wordgen.exe";
 	char* comm2 = "./wordsearch.exe";
 	char* comm3 = "./pager.exe";	
-	
 	
 	int pipefd1[2];
 	int pipefd2[2];
@@ -42,9 +39,11 @@ int main(int argc, char** argv){
 
 	if(pipe(pipefd1)<0){
 		fprintf(stderr,"Error piping pipe 1\n");
+		exit(-1);
 	}
 	if(pipe(pipefd2)<0){
 		fprintf(stderr,"Error piping pipe 2\n");
+		exit(-1);
 	}
 
 	int pid1,pid2,pid3;
@@ -52,6 +51,7 @@ int main(int argc, char** argv){
 	if((pid1=fork())==0){
 		if(dup2(pipefd1[1],1)==-1){
 			fprintf(stderr,"Error duping during execution of %s\n",comm1);
+			exit(-1);
 		}
 		close(pipefd1[0]);
 		close(pipefd1[1]);
@@ -59,19 +59,23 @@ int main(int argc, char** argv){
 		close(pipefd2[1]);
 		if(execvp(comm1,argv)<0){
 			fprintf(stderr,"Error executing %s\n",comm1);
+			exit(-1);
 		}
 	}
 	else if(pid1<0){
 		fprintf(stderr,"Error forking\n");
+		exit(-1);
 	}
 	else{
 		if((pid2=fork())==0){
 
 			if(dup2(pipefd1[0],0)<0){
 				fprintf(stderr,"Error duping during execution of %s\n",comm2);
+				exit(-1);
 			}
 			if(dup2(pipefd2[1],1)<0){
 				fprintf(stderr,"Error duping during execution of %s\n",comm2);
+				exit(-1);
 			}
 			close(pipefd1[0]);
 			close(pipefd1[1]);
@@ -79,16 +83,19 @@ int main(int argc, char** argv){
 			close(pipefd2[1]);
 			if(execvp(comm2,argv)<0){
 				fprintf(stderr,"Error executing %s\n",comm2);
+				exit(-1);
 			}
 		}
 		else if(pid2==-1){
 			fprintf(stderr,"Error forking\n");
+			exit(-1);
 		}
 		else{
 			
 			if((pid3=fork())==0){
 				if(dup2(pipefd2[0],0)<0){
 					fprintf(stderr,"Error duping during execution of %s\n",comm3);
+					exit(-1);
 				}
 				close(pipefd1[0]);
 				close(pipefd1[1]);
@@ -96,10 +103,12 @@ int main(int argc, char** argv){
 				close(pipefd2[1]);
 				if(execvp(comm3,argv)<0){
 					fprintf(stderr,"Error executing %s\n",comm3);
+					exit(-1);
 				}
 			}
 			else if(pid3<0){
 				fprintf(stderr,"Error forking\n");
+				exit(-1);
 			}
 		}
 		
@@ -111,20 +120,19 @@ int main(int argc, char** argv){
 
 	if((pchild1 = wait3(&status1,0,&ru1))<0){
 		fprintf(stderr, "Error waiting\n");
+		exit(-1);
 	}
 	printf("Child %d return with %d\n",pchild1,status1);
 	if((pchild2 = wait3(&status2,0,&ru2))<0){
 		fprintf(stderr, "Error waiting\n");
+		exit(-1);
 	}
 	printf("Child %d return with %d\n",pchild2,status2);
 	if((pchild3 = wait3(&status3,0,&ru3))<0){
 		fprintf(stderr, "Error waiting\n");
+		exit(-1);
 	}
 	printf("Child %d return with %d\n",pchild3,status3);
-
-
-
-
 
 	return 0;
 }
