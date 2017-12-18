@@ -42,10 +42,10 @@ int main(int argc, char ** argv) {
         off_t offset = 0;
         off_t pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
 
-        int length = 50;
+        int length = 5000;
         int fd = -1;
 
-        char* pm = mmap(addr, length, prot, flags, fd, 0);
+        int* pm = mmap(addr, length, prot, flags, fd, 0);
 
         if (pm == MAP_FAILED){
                 fprintf(stderr,"Error mapping memory\n");
@@ -55,23 +55,63 @@ int main(int argc, char ** argv) {
         
         struct spinlock* sp = malloc(sizeof(struct spinlock));
         spinlock_init(sp,0,getpid());
+        int retlock,retunlock;
         pm[0] = 0;
+        printf("ORIGINALLY PM: %d\n",pm[0]);
+        int count;
+        int val = 0;
+
+        if(!argv[2]){
+                count = 2;
+        }
+        else{
+                count = atoi(argv[2]);
+        }
+        int isfork = 0;
         for(int i=0;i<numchildren;i++){
                 switch(fork()){
                         case -1:
                                 fprintf(stderr,"Error forking\n");
+                                //exit(-1);
                                 break;
                         case 0:
-                                spin_lock(sp);
-                                pm
-                                spin_unlock(sp);
+                                isfork = 1;
+                                
+                                
+                                
+                                for(int k=0;k<100;k++){
+
+                                }
+                                for(int j=0;j<count;j++){
+                                        spin_lock(sp);
+                                        memcpy(&val,pm,sizeof(int));
+                                        for(int k=0;k<100;k++){
+
+                                        }
+                                        val++;
+                                        memcpy(pm,&val,sizeof(int));  
+                                        spin_unlock(sp); 
+                                }
+                                
+                                
+                                exit(0);
                                 break;
                         default:
                                 break;
 
                 }
+                if(isfork){
+                        break;
+                }
         }
-        printf("A = %d\n",a);
+        struct rusage ru;
+        int status;
+
+        for(int i=0;i<numchildren;i++){
+                wait3(&status,0,&ru);
+        }
+        memcpy(&val,pm,sizeof(int));
+        printf("VALUE SHOULD BE: %d but \nA = %d\n",numchildren*count,val);
 
         
 

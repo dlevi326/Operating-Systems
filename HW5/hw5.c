@@ -8,23 +8,20 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
-void handleBus(){
-        printf("Bus error encountered, exiting\n");
-        exit(7);
-}
-
-void handleSeg(){
-        printf("Seg fault encountered, exiting\n");
-        exit(11);
-}
-
-void handleBus2(){
-        fprintf(stderr,"Bus error encountered when reading beyond a page but within 2 pages\n");
-        exit(7);
+void handler(int signo){
+        fprintf(stderr, "Signal recieved: %d\n", signo);
+        exit(signo);
 }
 
 void questionOne(){
+        for(int j = 0; j<32; j++){
+                if (signal(j, handler) == SIG_ERR){
+                        fprintf(stderr,"signal: %d\n", j);
+                }
+        }
+
         void* addr = NULL;
         int prot = PROT_READ;
         int flags = MAP_SHARED;
@@ -56,19 +53,11 @@ void questionOne(){
                 fprintf(stderr,"Error mapping memory\n");
                 exit(-1);
         }
-
-        signal(SIGSEGV,handleSeg);
-        signal(SIGBUS,handleBus);
         
+        fprintf(stderr,"Attempting to write a string....\n");
         char* word = "Other message";
-        /*for(int i=0;i<strlen(word);i++){
-                signal(SIGBUS,handleBus);
-                signal(SIGSEGV,handleSeg);
+        for(int i=0;i<strlen(word);i++){
                 pm[i] = word[i];
-        }*/
-        if(memcpy(pm,word,strlen(word))==NULL){
-                fprintf(stderr,"Error copying memory\n");
-                exit(-1);
         }
 
         if(msync(pm,length, MS_SYNC)==-1){
@@ -100,6 +89,13 @@ void questionOne(){
 }
 
 void questionTwoAndThree(int question){
+
+        for(int j = 0; j<32; j++){
+                if (signal(j, handler) == SIG_ERR){
+                        fprintf(stderr,"signal: %d\n", j);
+                }
+        }
+
         void* addr = NULL;
         int prot = PROT_READ|PROT_WRITE;
         int flags;
@@ -144,8 +140,7 @@ void questionTwoAndThree(int question){
         char letter = 'X';
         char temp = pm[0];
         pm[0] = letter;
-        signal(SIGBUS,handleBus);
-        signal(SIGSEGV,handleSeg);
+        
                 
         if(msync(pm,length, MS_SYNC)==-1){
                 fprintf(stderr,"Error syncing to file\n");
@@ -175,6 +170,12 @@ void questionTwoAndThree(int question){
 }
 
 void questionFour(){
+        for(int j = 0; j<32; j++){
+                if (signal(j, handler) == SIG_ERR){
+                        fprintf(stderr,"signal: %d\n", j);
+                }
+        }
+
         void* addr = NULL;
         int prot = PROT_READ|PROT_WRITE;
         int flags = MAP_SHARED;
@@ -210,7 +211,7 @@ void questionFour(){
                 exit(-1);
         }
 
-        int length = sb.st_size; // Length is 5523 --> "...from other 8-bit encodings.[3]"
+        int length = sb.st_size; 
 
         off_t offset = 0;
         off_t pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
@@ -224,8 +225,7 @@ void questionFour(){
 
         char letter = 'X';
         pm[length+5] = letter; // To bring length to a theoretical 5530
-        signal(SIGBUS,handleBus);
-        signal(SIGSEGV,handleSeg);
+        
                 
         
         if(msync(pm,length+5, MS_SYNC)==-1){
@@ -251,6 +251,11 @@ void questionFour(){
 }
 
 void questionFive(){
+        for(int j = 0; j<32; j++){
+                if (signal(j, handler) == SIG_ERR)
+                fprintf(stderr,"signal: %d\n", j);
+        }
+
         void* addr = NULL;
         int prot = PROT_READ|PROT_WRITE;
         int flags = MAP_SHARED;
@@ -297,8 +302,7 @@ void questionFive(){
 
         char letter = 'X';
         pm[length+5] = letter; // To bring length to a theoretical 5530
-        signal(SIGBUS,handleBus);
-        signal(SIGSEGV,handleSeg);
+        
         if(msync(pm,length+5, MS_SYNC)==-1){
                 fprintf(stderr,"Error syncing to file\n");
                 exit(-1);
@@ -336,6 +340,12 @@ void questionFive(){
 }
 
 void questionSix(){
+        for(int j = 0; j<32; j++){
+                if (signal(j, handler) == SIG_ERR){
+                        fprintf(stderr,"signal: %d\n", j);
+                }
+        }
+
         void* addr = NULL;
         int prot = PROT_READ|PROT_WRITE;
         int flags = MAP_SHARED;
@@ -368,7 +378,7 @@ void questionSix(){
                 fprintf(stderr,"Error stating file\n");
                 exit(-1);
         }
-        int length = sb.st_size; // Length is 5523 --> "...from other 8-bit encodings.[3]"
+        int length = sb.st_size; 
 
         off_t offset = 0;
         off_t pa_offset = offset & ~(sysconf(_SC_PAGE_SIZE) - 1);
@@ -380,14 +390,16 @@ void questionSix(){
                 exit(-1);
         }
 
-        signal(SIGBUS,handleBus);
-        char letter = pm[4000];
-        fprintf(stderr,"Read: %c\n",letter);
-
-        signal(SIGBUS,handleBus2);
-        char letter2 = pm[8000];
-        fprintf(stderr,"Read: %c\n",letter2);
         
+        char letter = pm[4000];
+        fprintf(stderr,"No signal within one page and read: %c\n",letter);
+
+        
+        char letter2 = pm[8000];
+        fprintf(stderr,"No signal within two pages and read: %c\n",letter2);
+
+
+
 }
 
 int main(int argc, char** argv){

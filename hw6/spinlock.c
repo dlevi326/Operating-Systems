@@ -28,6 +28,7 @@ void spin_lock(struct spinlock *l){
 	while(flag){
 		if(!tas(&(l->taschar))){
 			l->taschar = 1;
+			flag = 0;
 		}
 		else{
 			while(tas(&(l->taschar)));
