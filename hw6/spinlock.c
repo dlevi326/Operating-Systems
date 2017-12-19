@@ -23,7 +23,7 @@ void spinlock_init(struct spinlock* sp, char c, pid_t currpid){
 }
 
 void spin_lock(struct spinlock *l){
-
+	
 	int flag = 1;
 	while(flag){
 		if(!tas(&(l->taschar))){
@@ -41,5 +41,6 @@ void spin_lock(struct spinlock *l){
 }
 
 void spin_unlock(struct spinlock *l){
+
 	l->taschar = 0;
 }

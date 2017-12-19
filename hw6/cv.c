@@ -83,26 +83,36 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 }
 
 int cv_broadcast(struct cv *cv){
-	/*spin_lock(cv->mutex);
+	spin_lock(cv->mutex);
 	int result = 0;
+
+	if(cv->proccount == 0){
+		return 0;
+	}
 
 	for(int i=0;i<CV_MAXPROC;i++){
 		if(cv->procs[i]>0){
 			result++;
 			kill(cv->procs[i],SIGUSR1);
-			cv->procs[i] = 0;
 		}
 	}
-	spin_unlock(cv->mutex);*/
-	int result = 0;
-	fprintf(stderr,"PID IN PROCS IS: %d\n",cv->procs[0]);
-	fprintf(stderr,"Killing process %d\n",cv->procs[cv->proccount-1]);
-	kill(cv->procs[cv->proccount-1],SIGUSR1);
+	spin_unlock(cv->mutex);
 
 
 	return result;
 }
 
 int cv_signal(struct cv *cv){
-	return 0;
+	int result = 0;
+	if(cv->proccount==0){
+		fprintf(stderr,"Error, no processes currently sleeping\n");
+		return 0;
+	}
+
+	spin_lock(cv->mutex);
+	kill(cv->procs[cv->proccount-1],SIGUSR1);
+	result++;
+	spin_unlock(cv->mutex);
+
+	return result;
 }

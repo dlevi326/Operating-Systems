@@ -1,3 +1,6 @@
+#ifndef _CV_H
+#define _CV_H
+
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -49,3 +52,5 @@ int cv_signal(struct cv *cv);
 /* Exactly the same as cv_broadcast except at most one sleeper is awoken.
  * Your choice how to pick which one if more than one candidate
  */
+
+#endif
