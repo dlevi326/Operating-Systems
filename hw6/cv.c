@@ -38,7 +38,7 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 		fprintf(stderr,"Error, too many processes\n");
 		exit(-1);
 	}
-	
+	//spin_lock(cv->mutex);
 	spin_unlock(mutex);
 	fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
 	cv->procs[cv->proccount] = getpid(); // Putting process to sleep
@@ -61,6 +61,7 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 
     sigsuspend(&new_mask);
     //spin_unlock(mutex);
+    //spin_unlock(cv->mutex);
     if(cv->proccount>0){
     	fprintf(stderr,"Waking up!\n");
     	fprintf(stderr,"Setting %d to 0\n",cv->procs[cv->proccount-1]);

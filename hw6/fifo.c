@@ -51,7 +51,7 @@ void fifo_wr(struct fifo *f,unsigned long d){
 	}
 	
 	f->buf[f->next_write++] = d;
-	f->next_read%=MYFIFO_BUFSIZ;
+	f->next_write%=MYFIFO_BUFSIZ;
 	f->item_count++;
 	
 	printf("Sending signal that space has opened up to empty\n");

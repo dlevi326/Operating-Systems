@@ -20,6 +20,9 @@ int tas(volatile char *lock);
 
 struct fifo* f;
 
+void test1(struct fifo* f);
+void test2(struct fifo* f);
+
 
 int main(int argc, char ** argv) {
 	
@@ -38,72 +41,103 @@ int main(int argc, char ** argv) {
             exit(-1);
     }
 
-    //struct fifo* f;
-	//f = (struct fifo*)(pm+sizeof(struct fifo)*8);
 	fifo_init(f);
 
-	/*switch(fork()){
-		case 0:
+	test2(f);
 
-			sleep(1);
-			printf("Before writing, empty has proccount of: %d\n",f->empty.proccount);
-			printf("EXECUTING WRITE\n");
-			fifo_wr(f,11);
+	//test1(f);
 
-			exit(0);
-			break;
-		default:
+	return 0;
+}
 
-			printf("EXECUTING READ\n");
-			printf("Fifo reads: %lu\n",fifo_rd(f));
-
-			break;
-	}*/
-
-
-	/*printf("Fifo reads: %lu\n",fifo_rd(f));
-	fifo_wr(f,11);
-	printf("Fifo reads: %lu\n",fifo_rd(f));*/
-
-
+void test1(struct fifo* f){
 	switch(fork()){
 		case -1:
 			fprintf(stderr,"Error forking\n");
 			exit(-1);
 		case 0:
 			// Writer
-			for(unsigned long i=0;i<5;i++){
-				fprintf(stderr,"Executing write\n");
-				//printf("Empty has proccount %d -- Full has proccount %d\n",f->empty->proccount,f->full->proccount);
-				fifo_wr(f,i);
-			}
-			sleep(1);
-			for(unsigned long i=5;i<10;i++){
-				fprintf(stderr,"Executing write\n");
-				//printf("Empty has proccount %d -- Full has proccount %d\n",f->empty->proccount,f->full->proccount);
-				fifo_wr(f,i);
-			}
 
+			for(unsigned long i=0;i<2000;i++){
+				fprintf(stderr,"Executing write\n");
+				fifo_wr(f,i);
+			}
 
 			exit(0);
 			break;
 		default:
 			// Reader
 			
-			for(int j=0;j<10;j++){
+			for(int j=0;j<2000;j++){
 				fprintf(stderr,"Executing read\n");
 				fprintf(stderr,"Read: %lu\n",fifo_rd(f));
 			}
 
+
 			break;
+	}
+	sleep(2);
+	printf("At the end, array has %lu at first index\n",f->buf[0]);
+	exit(0);
+}
+
+void test2(struct fifo* f){
+
+	int numwriters = 60;
+	int items = 10;
+	unsigned long tracker[numwriters*items];
+	for(int i=0;i<numwriters*items;i++){
+		tracker[i] = 1;
 	}
 
 
+	switch(fork()){
+		case -1:
+			fprintf(stderr,"Error forking\n");
+			break;
+		case 0:
 
+			for(int i=0;i<numwriters;i++){
+				int infork = 0;
+				switch(fork()){
+					case -1:
+						fprintf(stderr,"Error forking\n");
+						break;
+					case 0:
+						infork = 1;
+						for(int k=0;k<items;k++){
+							printf("EXECUTING WRITE:\n");
+							fifo_wr(f,i+(numwriters*k));
+						}
+						exit(0);
+						break;
+					default:
+						break;
+				}
+				if(infork){
+					break;
+				}
+			}
+			exit(0);
+			break;
+		default:
+			for(int i=0;i<numwriters*items;i++){
+				printf("EXECUTING READ:\n");
+				unsigned long numread = fifo_rd(f);
+				if(tracker[numread]){
+					printf("Setting pos %lu to 0\n",numread);
+					tracker[numread] = 0;
+				}
+				else{
+					fprintf(stderr,"****** Error, duplicate or absent item ******** (%lu)\n",numread);
+					exit(0);
+				}
+			}
+			fprintf(stderr,"!!!! SUCCESS !!!!!!\n");
+			break;
+	}
+	exit(0);
 
-
-
-	return 0;
 }
 
 
