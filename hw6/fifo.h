@@ -22,12 +22,16 @@
 
 volatile struct fifo{
 
-	char buf[MYFIFO_BUFSIZ];
+	unsigned long buf[MYFIFO_BUFSIZ];
 	int next_write;
 	int next_read;
-	struct cv* full;
-	struct cv* empty;
-	struct spinlock* mutex;
+	int item_count;
+	struct cv full; // Made it regular, no pointer
+	struct cv empty;
+	struct spinlock mutex;
+
+
+
 
 }fifo;
 

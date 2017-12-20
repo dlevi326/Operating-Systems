@@ -38,18 +38,20 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 		fprintf(stderr,"Error, too many processes\n");
 		exit(-1);
 	}
-	else{
-		fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
-		cv->procs[cv->proccount] = getpid(); // Putting process to sleep
-		cv->proccount++;
-		fprintf(stderr,"Confirming position %d has pid %d\n",cv->proccount-1,cv->procs[cv->proccount-1]);
-	}
+	
+	spin_unlock(mutex);
+	fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
+	cv->procs[cv->proccount] = getpid(); // Putting process to sleep
+	cv->proccount++;
+	fprintf(stderr,"Confirming position %d has pid %d\n",cv->proccount-1,cv->procs[cv->proccount-1]);
+	
 
 	
 	
-	spin_lock(mutex);
+	
 	
 	fprintf(stderr,"Going to sleep....\n");
+
 	signal(SIGUSR1, handler);
     sigset_t old_mask, new_mask;
     sigfillset(&new_mask);
@@ -57,23 +59,18 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
     sigdelset(&new_mask, SIGUSR1);
     sigprocmask(SIG_BLOCK, &new_mask, &old_mask);
 
-
-	/*printf("Before for loop:\n");
-    for(int i=0;i<100000;i++){
-
-    }
-    printf("After for loop:\n");*/
     sigsuspend(&new_mask);
-    spin_unlock(mutex);
+    //spin_unlock(mutex);
     if(cv->proccount>0){
     	fprintf(stderr,"Waking up!\n");
     	fprintf(stderr,"Setting %d to 0\n",cv->procs[cv->proccount-1]);
     	cv->procs[cv->proccount-1] = 0;// Waking up process
     	cv->proccount--;
+    	spin_lock(mutex);
     	return;
     }
     
-    
+    spin_lock(mutex);
     sigprocmask(SIG_UNBLOCK, &new_mask, NULL);
 
 	
@@ -105,7 +102,7 @@ int cv_broadcast(struct cv *cv){
 int cv_signal(struct cv *cv){
 	int result = 0;
 	if(cv->proccount==0){
-		fprintf(stderr,"Error, no processes currently sleeping\n");
+		fprintf(stderr,"No processes currently sleeping\n");
 		return 0;
 	}
 
