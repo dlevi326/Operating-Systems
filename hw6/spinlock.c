@@ -16,9 +16,8 @@
 
 int tas(volatile char * lock);
 
-void spinlock_init(struct spinlock* sp, char c, pid_t currpid){
+void spinlock_init(struct spinlock* sp, char c){
 	sp->taschar = c;
-	sp->holderpid = currpid;
 	sp->count = 0;
 }
 

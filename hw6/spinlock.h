@@ -4,12 +4,11 @@
 struct spinlock{
 
 	char taschar;
-	pid_t holderpid;
 	int count;
 
 };
 
-void spinlock_init(struct spinlock* sp, char c, pid_t currpid);
+void spinlock_init(struct spinlock* sp, char c);
 void spin_lock(struct spinlock *l);
 void spin_unlock(struct spinlock *l);
 int tas(volatile char *lock);

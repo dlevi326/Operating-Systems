@@ -16,19 +16,9 @@
 #include "cv.h"
 #include "fifo.h"
 
-/*char buf[MYFIFO_BUFSIZ];
-	int next_write;
-	int next_read;
-	int item_count;
-	struct cv* full;
-	struct cv* empty;
-	struct spinlock* mutex;*/
-
-
-
 void fifo_init(struct fifo *f){
 
-	spinlock_init(&f->mutex,0,0);
+	spinlock_init(&f->mutex,0);
 	cv_init(&f->full);
 	cv_init(&f->empty);
 
@@ -40,7 +30,6 @@ void fifo_init(struct fifo *f){
 }
 
 void fifo_wr(struct fifo *f,unsigned long d){
-	
 	
 	spin_lock(&f->mutex);
 
@@ -56,9 +45,6 @@ void fifo_wr(struct fifo *f,unsigned long d){
 	
 	printf("Sending signal that space has opened up to empty\n");
 	cv_signal(&f->empty);
-	/*if(!cv_broadcast(f->empty)){
-		printf("No processes woken!!!\n");
-	}*/
 		
 	spin_unlock(&f->mutex);
 	
@@ -83,8 +69,6 @@ unsigned long fifo_rd(struct fifo *f){
 	printf("Sending signal that space has opened up to full\n");
 	cv_signal(&f->full);
 		
-		
-	
 	spin_unlock(&f->mutex);
 
 	return ul;

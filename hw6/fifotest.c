@@ -161,7 +161,6 @@ void test2(struct fifo* f){
 					threadtracker[numread%numwriters] = numread;
 				}
 				if(tracker[numread]){
-					//printf("Setting pos %lu to 0\n",numread);
 					tracker[numread] = 0;
 				}
 				else{

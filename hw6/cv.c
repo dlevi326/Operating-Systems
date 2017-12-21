@@ -23,7 +23,7 @@ void handler(int signum){
 void cv_init(struct cv *cv){
 
 	cv->mutex = malloc(sizeof(struct spinlock));
-	spinlock_init(cv->mutex,0,0);
+	spinlock_init(cv->mutex,0);
 	
 	for(int i=0;i<CV_MAXPROC;i++){
 		cv->procs[i] = 0;
@@ -38,12 +38,10 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 		fprintf(stderr,"Error, too many processes\n");
 		exit(-1);
 	}
-	//spin_lock(cv->mutex);
 	spin_unlock(mutex);
-	//fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
 	cv->procs[cv->proccount] = getpid(); // Putting process to sleep
 	cv->proccount++;
-	//fprintf(stderr,"Confirming position %d has pid %d\n",cv->proccount-1,cv->procs[cv->proccount-1]);
+	
 	
 
 	
@@ -55,16 +53,12 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 	signal(SIGUSR1, handler);
     sigset_t old_mask, new_mask;
     sigfillset(&new_mask);
-    sigdelset(&new_mask, SIGINT);
     sigdelset(&new_mask, SIGUSR1);
     sigprocmask(SIG_BLOCK, &new_mask, &old_mask);
 
     sigsuspend(&new_mask);
-    //spin_unlock(mutex);
-    //spin_unlock(cv->mutex);
     if(cv->proccount>0){
     	fprintf(stderr,"Waking up!\n");
-    	//fprintf(stderr,"Setting %d to 0\n",cv->procs[cv->proccount-1]);
     	cv->procs[cv->proccount-1] = 0;// Waking up process
     	cv->proccount--;
     	spin_lock(mutex);

@@ -21,8 +21,6 @@
 
 struct cv{
 	struct spinlock* mutex;
-	pid_t currpid;
-	
 	pid_t procs[CV_MAXPROC];
 	int proccount;
 };

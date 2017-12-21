@@ -24,6 +24,7 @@ int main(int argc, char ** argv) {
 
         if(!argv[1]){
                 fprintf(stderr,"Please specify number of child processes\n");
+                exit(-1);
         }
         else{
                 numchildren = atoi(argv[1]);
@@ -51,9 +52,8 @@ int main(int argc, char ** argv) {
         
         struct spinlock* sp;
         sp = (struct spinlock *)(pm+sizeof(int));
-        spinlock_init(sp,0,getpid());
+        spinlock_init(sp,0);
 
-        pm[0] = 0;
         int count;
         int val = 0;
 
@@ -72,10 +72,6 @@ int main(int argc, char ** argv) {
                                 break;
                         case 0:
                                 isfork = 1;
-                                
-                                /*for(int k=0;k<100;k++){
-
-                                }*/
                                 for(int j=0;j<count;j++){
                                         spin_lock(sp);
                                         memcpy(&val,pm,sizeof(int));
@@ -86,7 +82,6 @@ int main(int argc, char ** argv) {
                                         memcpy(pm,&val,sizeof(int));  
                                         spin_unlock(sp); 
                                 }
-                                
                                 
                                 exit(0);
                                 break;
@@ -106,8 +101,6 @@ int main(int argc, char ** argv) {
         }
         memcpy(&val,pm,sizeof(int));
         printf("VALUE SHOULD BE: %d but \nA = %d\n",numchildren*count,val);
-
-        
 
         return 0;
 }
