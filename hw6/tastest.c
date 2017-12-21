@@ -73,9 +73,9 @@ int main(int argc, char ** argv) {
                         case 0:
                                 isfork = 1;
                                 
-                                for(int k=0;k<100;k++){
+                                /*for(int k=0;k<100;k++){
 
-                                }
+                                }*/
                                 for(int j=0;j<count;j++){
                                         spin_lock(sp);
                                         memcpy(&val,pm,sizeof(int));

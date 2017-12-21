@@ -40,10 +40,10 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
 	}
 	//spin_lock(cv->mutex);
 	spin_unlock(mutex);
-	fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
+	//fprintf(stderr,"Setting pid of %d to %d\n",cv->proccount,getpid());
 	cv->procs[cv->proccount] = getpid(); // Putting process to sleep
 	cv->proccount++;
-	fprintf(stderr,"Confirming position %d has pid %d\n",cv->proccount-1,cv->procs[cv->proccount-1]);
+	//fprintf(stderr,"Confirming position %d has pid %d\n",cv->proccount-1,cv->procs[cv->proccount-1]);
 	
 
 	
@@ -64,7 +64,7 @@ void cv_wait(struct cv *cv, struct spinlock *mutex){
     //spin_unlock(cv->mutex);
     if(cv->proccount>0){
     	fprintf(stderr,"Waking up!\n");
-    	fprintf(stderr,"Setting %d to 0\n",cv->procs[cv->proccount-1]);
+    	//fprintf(stderr,"Setting %d to 0\n",cv->procs[cv->proccount-1]);
     	cv->procs[cv->proccount-1] = 0;// Waking up process
     	cv->proccount--;
     	spin_lock(mutex);
@@ -103,7 +103,7 @@ int cv_broadcast(struct cv *cv){
 int cv_signal(struct cv *cv){
 	int result = 0;
 	if(cv->proccount==0){
-		fprintf(stderr,"No processes currently sleeping\n");
+		fprintf(stderr,"No processes currently sleeping, skipping..\n");
 		return 0;
 	}
 

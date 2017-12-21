@@ -25,6 +25,11 @@ void test2(struct fifo* f);
 
 
 int main(int argc, char ** argv) {
+
+	if(argc!=2){
+		fprintf(stderr,"Error: Usage <./fifotest> <test number>\n");
+		exit(-1);
+	}
 	
 
 	void* addr = NULL;
@@ -43,14 +48,22 @@ int main(int argc, char ** argv) {
 
 	fifo_init(f);
 
-	test2(f);
-
-	//test1(f);
+	int testnum = atoi(argv[1]);
+	if(testnum==1){
+		test1(f);
+	}
+	else if(testnum==2){
+		test2(f);
+	}
+	else{
+		fprintf(stderr,"Error, invalid test number\n");
+	}
 
 	return 0;
 }
 
 void test1(struct fifo* f){
+	unsigned long comparison = 0;
 	switch(fork()){
 		case -1:
 			fprintf(stderr,"Error forking\n");
@@ -70,24 +83,40 @@ void test1(struct fifo* f){
 			
 			for(int j=0;j<2000;j++){
 				fprintf(stderr,"Executing read\n");
-				fprintf(stderr,"Read: %lu\n",fifo_rd(f));
+				unsigned long numread = fifo_rd(f);
+				fprintf(stderr,"Read: %lu\n",numread);
+				if(numread == comparison){
+					comparison++;
+				}
+
 			}
 
 
 			break;
 	}
-	sleep(2);
-	printf("At the end, array has %lu at first index\n",f->buf[0]);
+	int status;
+	wait(&status);
+	if(comparison==2000){
+		fprintf(stderr,"!!! SUCCESS !!!\n");
+	}
+	else{
+		fprintf(stderr,"*** Failure, comparison should be 2000, but it is: %lu\n",comparison);
+	}
 	exit(0);
 }
 
 void test2(struct fifo* f){
 
 	int numwriters = 60;
-	int items = 10;
+	int items = 20;
 	unsigned long tracker[numwriters*items];
 	for(int i=0;i<numwriters*items;i++){
 		tracker[i] = 1;
+	}
+
+	unsigned long threadtracker[numwriters*items];
+	for(unsigned long ww=0;ww<numwriters*items;ww++){
+		threadtracker[ww] = 0;
 	}
 
 
@@ -124,8 +153,15 @@ void test2(struct fifo* f){
 			for(int i=0;i<numwriters*items;i++){
 				printf("EXECUTING READ:\n");
 				unsigned long numread = fifo_rd(f);
+				if(threadtracker[numread%numwriters]>numread){
+					fprintf(stderr,"****** Read %lu which is less than %lu ********\n",numread,threadtracker[numread%numwriters]);
+					exit(0);
+				}
+				else{
+					threadtracker[numread%numwriters] = numread;
+				}
 				if(tracker[numread]){
-					printf("Setting pos %lu to 0\n",numread);
+					//printf("Setting pos %lu to 0\n",numread);
 					tracker[numread] = 0;
 				}
 				else{
@@ -133,40 +169,11 @@ void test2(struct fifo* f){
 					exit(0);
 				}
 			}
-			fprintf(stderr,"!!!! SUCCESS !!!!!!\n");
+			fprintf(stderr,"!!!! SUCCESS !!!!!!\n"); // If it gets here it worked
 			break;
 	}
 	exit(0);
 
 }
-
-
-// m is buffer (Same as a mutex)
-/*void producer(){
-	while(producer can still produce){
-		x = produce();
-		m.append(x);
-	}
-}
-
-void consumer(){
-	while(can still consume){
-		x = m.take();
-		consume(x);
-	}
-}
-
-void main(){
-	parallel launch (producer(),consumer());
-}*/
-
-
-
-
-
-
-
-
-
 
 
